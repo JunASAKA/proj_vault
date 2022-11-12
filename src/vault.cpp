@@ -11,6 +11,7 @@ int main(int argc, char *argv[])
 		generate,
 		update,
 		_delete_,
+		list_all,
 		help
 	};
 	mode selected = mode::help;
@@ -46,7 +47,9 @@ int main(int argc, char *argv[])
 	auto delete_mode = (clipp::command("delete").set(selected, mode::_delete_),
 						clipp::option("--codename") & clipp::value("codename", codename) % "codename");
 
-	auto cli = ((storage_mode | read_mode | generage_mode | update_mode | delete_mode | clipp::command("help").set(selected, mode::help)),
+	auto list_all_mode = (clipp::command("list_all").set(selected, mode::list_all));
+
+	auto cli = ((storage_mode | read_mode | generage_mode | update_mode | delete_mode | list_all_mode | clipp::command("help").set(selected, mode::help)),
 				clipp::option("-v", "--version").call([]
 													  { std::cout << "version 0.00a" << std::endl; })
 					.doc("show version"),
@@ -99,13 +102,16 @@ int main(int argc, char *argv[])
 			else
 			{
 				user_record *input_record = db_manager::get_user_record_from_db(codename);
-				if(!username.empty()){
+				if (!username.empty())
+				{
 					input_record->username = username;
 				}
-				if(!password_unencrypted.empty()){
+				if (!password_unencrypted.empty())
+				{
 					input_record->password = password_unencrypted;
 				}
-				if(!urls.empty()){
+				if (!urls.empty())
+				{
 					input_record->urls = urls;
 				}
 				std::cout << db_manager::update_record(input_record) << std::endl;
@@ -121,10 +127,14 @@ int main(int argc, char *argv[])
 			}
 			else
 			{
+				std::cout << db_manager::delete_record(codename) << std::endl;
 			}
 			break;
+		case mode::list_all:
+			db_manager::list_all_keys();
+			break;
 		case mode::help:
-			std::cout << clipp::make_man_page(cli, "zhixueUtilities") << std::endl;
+			std::cout << clipp::make_man_page(cli, "vault") << std::endl;
 			break;
 		default:
 			break;

@@ -106,7 +106,7 @@ namespace db_manager
 			std::cout << "error" << std::endl;
 		}
 
-		std::string sqlSentence = "update record set username=\"" + input_user_record->username + "\", password=\"" + input_user_record->password + "\", urls=\"" + input_user_record->urls + "\" where codename=\""+input_user_record->codename+"\";";
+		std::string sqlSentence = "update record set username=\"" + input_user_record->username + "\", password=\"" + input_user_record->password + "\", urls=\"" + input_user_record->urls + "\" where codename=\"" + input_user_record->codename + "\";";
 		sqlite3_stmt *stmt = NULL;
 
 		result = sqlite3_prepare_v2(sql, sqlSentence.c_str(), -1, &stmt, NULL);
@@ -124,6 +124,86 @@ namespace db_manager
 			sqlite3_finalize(stmt);
 			return false;
 		}
+	}
+
+	bool delete_record(std::string codename)
+	{
+		sqlite3 *sql = NULL;
+		const char *path = "../test.db";
+
+		int32_t result = sqlite3_open_v2(path, &sql, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX | SQLITE_OPEN_SHAREDCACHE, NULL);
+
+		if (result == SQLITE_OK)
+		{
+			std::cout << "successful" << std::endl;
+		}
+		else
+		{
+			std::cout << "error" << std::endl;
+		}
+
+		std::string sqlSentence = "delete from record where codename=\"" + codename + "\";";
+		sqlite3_stmt *stmt = NULL;
+
+		result = sqlite3_prepare_v2(sql, sqlSentence.c_str(), -1, &stmt, NULL);
+
+		if (result == SQLITE_OK)
+		{
+			std::cout << "done" << std::endl;
+			sqlite3_step(stmt);
+			sqlite3_finalize(stmt);
+			return true;
+		}
+		else
+		{
+			std::cout << "error: delete" << std::endl;
+			sqlite3_finalize(stmt);
+			return false;
+		}
+	}
+
+	void list_all_keys()
+	{
+		sqlite3 *sql = NULL;
+		const char *path = "../test.db";
+
+		int32_t result = sqlite3_open_v2(path, &sql, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX | SQLITE_OPEN_SHAREDCACHE, NULL);
+
+		if (result == SQLITE_OK)
+		{
+			std::cout << "successful" << std::endl;
+		}
+		else
+		{
+			std::cout << "error" << std::endl;
+		}
+
+		std::string sqlSentence = "select codename from record;";
+		sqlite3_stmt *stmt = NULL;
+
+		result = sqlite3_prepare_v2(sql, sqlSentence.c_str(), -1, &stmt, NULL);
+
+		if (result == SQLITE_OK)
+		{
+			std::cout << "pass." << std::endl;
+			while (sqlite3_step(stmt) == SQLITE_ROW)
+			{
+				std::cout << reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0)) << std::endl;
+			}
+		}
+		else
+		{
+			std::cout << "error: sy";
+		}
+		sqlite3_finalize(stmt);
+
+		if (sql)
+		{
+			sqlite3_close_v2(sql);
+			sql = nullptr;
+		}
+
+		return;
 	}
 
 }
