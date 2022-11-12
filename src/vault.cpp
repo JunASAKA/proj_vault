@@ -13,46 +13,23 @@ int main(int argc, char *argv[])
 	};
 	mode selected = mode::help;
 
-	// std::string tchToken;
-	// std::string stuToken;
-	//  std::string hwId;
-	//  std::string stuId;
-	//  std::string stuHwId;
-	//  std::string listIndex;
-	//  std::string stuUsername;
-	//  std::string stuPasswd;
-	//  std::string tchUsername;
-	//  std::string tchPasswd;
-	//  std::string attachmentUrl;
-	//  std::string clazzId;
-
-	// //std::string finaloutStr;
-
-	// bool useIndex = false;
-	// bool completed = false;
-	// bool isClkHw = false;
-	// //bool useClazzId = false;
-	// bool redoWithStuId = false;
-
-	std::string nickname = "";
+	std::string codename = "";
 	std::string username = "";
 	std::string password_unencrypted = "";
 	std::string json_unencrypted = "";
+	std::string urls = "";
 
 	bool output_as_json = false;
 
-	// auto getListMode = (clipp::command("getList").set(selected, mode::getList),
-	// 					clipp::option("-stu", "--student-login") & clipp::value("stuUsername", stuUsername) % "Student's username" & clipp::value("stuPasswd", stuPasswd) % "Student's encoded Psssword",
-	// 					clipp::option("--already-done").set(completed, true).doc("use the list of completed homeworks"));
-
 	auto storage_mode = (clipp::command("storage").set(selected, mode::storage),
-						 clipp::option("--nickname") & clipp::value("nickname", nickname) % "nickname",
+						 clipp::option("--codename") & clipp::value("codename", codename) % "codename",
 						 clipp::option("--username") & clipp::value("username", username) % "username",
 						 clipp::option("--password") & clipp::value("password_unencrypted", password_unencrypted) % "password",
+						 clipp::option("--urls") & clipp::value("urls", urls) % "urls",
 						 clipp::option("--json") & clipp::value("json_unencrypted", json_unencrypted) % "json");
 
 	auto read_mode = (clipp::command("read").set(selected, mode::read),
-					  clipp::option("--nickname") & clipp::value("nickname", nickname) % "nickname",
+					  clipp::option("--codename") & clipp::value("codename", codename) % "codename",
 					  clipp::option("--json-fmt").set(output_as_json, true).doc("output as json"));
 
 	auto generage_mode = (clipp::command("storage").set(selected, mode::generate));
@@ -65,44 +42,34 @@ int main(int argc, char *argv[])
 
 	if (parse(argc, argv, cli))
 	{
-		// if (std::getenv("stuUsername") != nullptr)
-		// {
-		// 	stuUsername = std::getenv("stuUsername");
-		// }
-		// if (std::getenv("stuPasswd") != nullptr)
-		// {
-		// 	stuPasswd = std::getenv("stuPasswd");
-		// }
-		// if (std::getenv("tchUsername") != nullptr)
-		// {
-		// 	tchUsername = std::getenv("tchUsername");
-		// }
-		// if (std::getenv("tchPasswd") != nullptr)
-		// {
-		// 	tchPasswd = std::getenv("tchPasswd");
-		// }
 		switch (selected)
 		{
 		case mode::storage:
-			if (nickname.empty())
+			if (codename.empty())
 			{
-				std::cout << "Error: nickname is neccessary." << std::endl;
+				std::cout << "Error: codename is neccessary." << std::endl;
 				break;
 			}
 			else
 			{
-				std::cout << db_manager::get_json_data_from_db(nickname) << std::endl;
+				user_record *input_record = new user_record(codename, username, password_unencrypted, urls);
+				std::cout << db_manager::storage_into_db(input_record) << std::endl;
 			}
 			break;
 		case mode::read:
-			if (nickname.empty())
+			if (codename.empty())
 			{
-				std::cout << "Error: nickname is neccessary." << std::endl;
+				std::cout << "Error: codename is neccessary." << std::endl;
 				break;
 			}
 			else
 			{
-				// TODO: 2;
+				user_record *output_record = db_manager::get_user_record_from_db(codename);
+				std::cout << "codename: " << output_record->codename << std::endl
+						  << "username: " << output_record->username << std::endl
+						  << "password: " << output_record->password << std::endl
+						  << "urls: " << output_record->urls << std::endl
+						  << std::endl;
 			}
 			break;
 		case mode::generate:
