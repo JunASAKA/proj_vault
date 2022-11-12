@@ -62,20 +62,20 @@ int main(int argc, char *argv[])
 		case mode::storage:
 			if (codename.empty())
 			{
-				std::cout << "Error: codename is neccessary." << std::endl;
+				std::cout << "[debug (top)] error: codename is neccessary." << std::endl;
 				break;
 			}
 			else
 			{
 				user_record *input_record = new user_record(codename, username, password_unencrypted, urls);
-				std::cout << db_manager::storage_into_db(input_record) << std::endl;
+				std::cout << (db_manager::storage_into_db(input_record) ? "[debug (top)] done." : "[debug (top)]error(s) occured above.") << std::endl;
 				delete input_record;
 			}
 			break;
 		case mode::read:
 			if (codename.empty())
 			{
-				std::cout << "Error: codename is neccessary." << std::endl;
+				std::cout << "[debug (top)] error: codename is neccessary." << std::endl;
 				break;
 			}
 			else
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 		case mode::update:
 			if (codename.empty())
 			{
-				std::cout << "Error: codename is neccessary." << std::endl;
+				std::cout << "[debug (top)] error: codename is neccessary." << std::endl;
 				break;
 			}
 			else
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
 				{
 					input_record->urls = urls;
 				}
-				std::cout << db_manager::update_record(input_record) << std::endl;
+				std::cout << (db_manager::update_record(input_record) ? "[debug (top)] done." : "[debug (top)]error(s) occured above.") << std::endl;
 				delete input_record;
 			}
 			break;
@@ -122,12 +122,12 @@ int main(int argc, char *argv[])
 		case mode::_delete_:
 			if (codename.empty())
 			{
-				std::cout << "Error: codename is neccessary." << std::endl;
+				std::cout << "[debug (top)] error: codename is neccessary." << std::endl;
 				break;
 			}
 			else
 			{
-				std::cout << db_manager::delete_record(codename) << std::endl;
+				std::cout << (db_manager::delete_record(codename) ? "[debug (top)] done." : "[debug (top)]error(s) occured above.") << std::endl;
 			}
 			break;
 		case mode::list_all:
