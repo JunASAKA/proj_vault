@@ -53,7 +53,7 @@ namespace db_manager
 		return return_user_record;
 	}
 
-	uint8_t storage_into_db(user_record *input_user_record)
+	bool storage_into_db(user_record *input_user_record)
 	{
 
 		sqlite3 *sql = NULL;
@@ -80,13 +80,49 @@ namespace db_manager
 			std::cout << "done" << std::endl;
 			sqlite3_step(stmt);
 			sqlite3_finalize(stmt);
-			return 0;
+			return true;
 		}
 		else
 		{
 			std::cout << "error: insert" << std::endl;
 			sqlite3_finalize(stmt);
-			return 1;
+			return false;
+		}
+	}
+
+	bool update_record(user_record *input_user_record)
+	{
+		sqlite3 *sql = NULL;
+		const char *path = "../test.db";
+
+		int32_t result = sqlite3_open_v2(path, &sql, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX | SQLITE_OPEN_SHAREDCACHE, NULL);
+
+		if (result == SQLITE_OK)
+		{
+			std::cout << "successful" << std::endl;
+		}
+		else
+		{
+			std::cout << "error" << std::endl;
+		}
+
+		std::string sqlSentence = "update record set username=\"" + input_user_record->username + "\", password=\"" + input_user_record->password + "\", urls=\"" + input_user_record->urls + "\" where codename=\""+input_user_record->codename+"\";";
+		sqlite3_stmt *stmt = NULL;
+
+		result = sqlite3_prepare_v2(sql, sqlSentence.c_str(), -1, &stmt, NULL);
+
+		if (result == SQLITE_OK)
+		{
+			std::cout << "done" << std::endl;
+			sqlite3_step(stmt);
+			sqlite3_finalize(stmt);
+			return true;
+		}
+		else
+		{
+			std::cout << "error: update" << std::endl;
+			sqlite3_finalize(stmt);
+			return false;
 		}
 	}
 
