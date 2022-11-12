@@ -9,9 +9,12 @@ namespace json_manager
 		std::unique_ptr<Json::CharReader> reader(readerBuilder.newCharReader());
 		Json::Value root;
 
-		if (reader->parse(input_json.data(), input_json.data() + input_json.size(), &root, &errs)){
+		if (reader->parse(input_json.data(), input_json.data() + input_json.size(), &root, &errs))
+		{
 			return root.toStyledString();
-		}else{
+		}
+		else
+		{
 			std::cout << errs << std::endl;
 			return "";
 		}

@@ -12,4 +12,5 @@ namespace db_manager
 	bool update_record(user_record *input_user_record);
 	bool delete_record(std::string codename);
 	void list_all_keys();
+	bool if_extist_key(std::string codename);
 }

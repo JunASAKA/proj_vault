@@ -5,11 +5,14 @@ namespace db_manager
 
 	user_record *get_user_record_from_db(std::string codename)
 	{
-
+		user_record *return_user_record = new user_record(codename);
+		if (!if_extist_key(codename))
+		{
+			std::cout << "[debug (db_manager)] error: codename not exist." << std::endl;
+			return return_user_record;
+		}
 		sqlite3 *sql = NULL;
 		const char *path = "../test.db";
-
-		user_record *return_user_record = new user_record(codename);
 
 		int32_t result = sqlite3_open_v2(path, &sql, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX | SQLITE_OPEN_SHAREDCACHE, NULL);
 
@@ -54,7 +57,11 @@ namespace db_manager
 
 	bool storage_into_db(user_record *input_user_record)
 	{
-
+		if (if_extist_key(input_user_record->codename))
+		{
+			std::cout << "[debug (db_manager)] error: codename already existed." << std::endl;
+			return false;
+		}
 		sqlite3 *sql = NULL;
 		const char *path = "../test.db";
 
@@ -91,6 +98,11 @@ namespace db_manager
 
 	bool update_record(user_record *input_user_record)
 	{
+		if (!if_extist_key(input_user_record->codename))
+		{
+			std::cout << "[debug (db_manager)] error: codename not exist." << std::endl;
+			return false;
+		}
 		sqlite3 *sql = NULL;
 		const char *path = "../test.db";
 
@@ -127,6 +139,11 @@ namespace db_manager
 
 	bool delete_record(std::string codename)
 	{
+		if (!if_extist_key(codename))
+		{
+			std::cout << "[debug (db_manager)] error: codename not exist." << std::endl;
+			return false;
+		}
 		sqlite3 *sql = NULL;
 		const char *path = "../test.db";
 
@@ -203,6 +220,60 @@ namespace db_manager
 		}
 
 		return;
+	}
+
+	bool if_extist_key(std::string codename)
+	{
+		sqlite3 *sql = NULL;
+		const char *path = "../test.db";
+
+		bool if_exist = false;
+
+		int32_t result = sqlite3_open_v2(path, &sql, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX | SQLITE_OPEN_SHAREDCACHE, NULL);
+
+		if (result == SQLITE_OK)
+		{
+			std::cout << "[debug (db_manager)] db opened successfully." << std::endl;
+		}
+		else
+		{
+			std::cout << "[debug (db_manager)] error(s) occured when opening db in function \"if_exist_key\"" << std::endl;
+		}
+
+		std::string sqlSentence = "select codename from record;";
+		sqlite3_stmt *stmt = NULL;
+
+		result = sqlite3_prepare_v2(sql, sqlSentence.c_str(), -1, &stmt, NULL);
+
+		if (result == SQLITE_OK)
+		{
+			std::cout << "[debug (db_manager)] sql sentence seems good." << std::endl;
+			while (sqlite3_step(stmt) == SQLITE_ROW)
+			{
+				if (reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0)) == codename)
+				{
+					if_exist = true;
+					break;
+				}
+				else
+				{
+					continue;
+				}
+			}
+		}
+		else
+		{
+			std::cout << "[debug (db_manager)] sql setence went wrong in function \"if_exist_key\".";
+		}
+		sqlite3_finalize(stmt);
+
+		if (sql)
+		{
+			sqlite3_close_v2(sql);
+			sql = nullptr;
+		}
+
+		return if_exist;
 	}
 
 }
